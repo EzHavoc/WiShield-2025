@@ -1,7 +1,9 @@
 fastapi
+fastapi.security
 uvicorn
 supabase
 pycryptodome
+dotenv
 scapy
 websockets
 python-dotenv
