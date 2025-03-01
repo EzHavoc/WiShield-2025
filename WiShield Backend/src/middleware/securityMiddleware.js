@@ -1,7 +1,7 @@
 // middleware/securityMiddleware.js
 import { scanNetwork } from "../utils/networkScanner.js";
 import PrivacyLog from "../models/PrivacyLog.js";
-import { io } from "../server.js";
+import { io } from "../../server.js";
 
 export const detectThreats = async (req, res, next) => {
   try {
