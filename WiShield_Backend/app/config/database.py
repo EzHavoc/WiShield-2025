@@ -1,33 +1,35 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-import os
-from dotenv import load_dotenv
 from supabase import create_client, Client
+from config.settings import settings
 
-# Load environment variables
-load_dotenv()
+class Database:
+    """Handles Supabase database connection and queries."""
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+    def __init__(self):
+        self.supabase: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
 
-# Create database engine
-engine = create_engine(DATABASE_URL)
+    def insert_log(self, user_id: str, threat_type: str, details: str):
+        """Insert a security log into the database."""
+        data = {
+            "user_id": user_id,
+            "threat_type": threat_type,
+            "details": details
+        }
+        response = self.supabase.table("security_logs").insert(data).execute()
+        return response
 
-# Session local
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    def get_logs(self, user_id: str):
+        """Fetch security logs for a specific user."""
+        response = self.supabase.table("security_logs").select("*").eq("user_id", user_id).execute()
+        return response
 
-# Base model
-Base = declarative_base()
+    def register_user(self, email: str, password: str):
+        """Register a new user in Supabase authentication."""
+        response = self.supabase.auth.sign_up({"email": email, "password": password})
+        return response
 
-# Initialize Supabase client
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+    def login_user(self, email: str, password: str):
+        """Authenticate user login."""
+        response = self.supabase.auth.sign_in_with_password({"email": email, "password": password})
+        return response
 
-# Dependency to get DB session
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+db = Database()
