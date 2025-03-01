@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+supabase
+pycryptodome
+scapy
+websockets
+python-dotenv
